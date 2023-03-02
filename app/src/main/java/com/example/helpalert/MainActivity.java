@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,10 +17,14 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.location.LocationListener;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.telephony.SmsManager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean isCourseLocationPermissionGranted = false;
     private boolean isFineLocationPermissionGranted = false;
     private boolean isSMSPermissionGranted = false;
+    private boolean isResponseYes = false;
+    private boolean isResponseNo = false;
+    private Dialog dialog;
+    CountDownTimer timer;
+
 
     @SuppressLint("MissingPermission")
     @Override
@@ -102,6 +112,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             userInfo.setText(firebaseUser.getEmail());
         }
 
+        //Create the Dialog here
+        dialog = new Dialog(this);
+        dialog.setContentView(R.layout.check_in_dialog);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            dialog.getWindow().setBackgroundDrawable(getDrawable(R.drawable.dialog_background));
+        }
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        dialog.setCancelable(false); //Optional
+        dialog.getWindow().getAttributes().windowAnimations = R.style.DialogAnimation; //Setting the animations to dialog
+
+        Button bttnYes = dialog.findViewById(R.id.btn_yes);
+        Button bttnNo = dialog.findViewById(R.id.btn_no);
+
+        bttnYes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
+                isResponseYes = true;
+                dialog.dismiss();
+            }
+        });
+
+        bttnNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                //Toast.makeText(MainActivity.this, "Cancel", Toast.LENGTH_SHORT).show();
+                isResponseNo = true;
+                dialog.dismiss();
+            }
+        });
+
         buttonLogout.setOnClickListener(view -> {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(getApplicationContext(), Login.class);
@@ -119,11 +162,47 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
                     this.start = System.currentTimeMillis();
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-                    getLocation();
+
+                    new CountDownTimer(10000, 1000) {
+                        public void onTick(long millisUntilFinished) {
+                            // Do nothing every second until 30 seconds have passed
+                        }
+
+                        public void onFinish() {
+                            // Call your function after 30 seconds have passed
+                            startCheckInDialog();
+                        }
+                    }.start();
+
+                    //getLocation();
                 }
                 return true;
             }
         });
+    }
+
+    private void startCheckInDialog(){
+        dialog.show();
+        timer = new CountDownTimer(10000, 1000) {
+            public void onTick(long millisUntilFinished) {
+                // Do nothing every second until 30 seconds have passed
+                if (isResponseYes){
+                    getLocation();
+                    timer.cancel();
+                }
+                if (isResponseNo){
+                    timer.cancel();
+                }
+            }
+
+            public void onFinish() {
+                // Call your function after 30 seconds have passed
+                if(!isResponseYes && !isResponseNo){
+                    getLocation();
+                }
+                dialog.dismiss();
+            }
+        }.start();
     }
 
     private void requestPermission(){
@@ -173,10 +252,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                                 Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
                                 List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
                                 String address = addresses.get(0).getAddressLine(0);
+                                String url = "https://www.google.com/maps/search/?api=1&query=" + location.getLatitude() + "," + location.getLongitude();
+                                Log.d("MyApp", url);
 
                                 textLocation.setText(address);
-                                Toast.makeText(MainActivity.this, address, Toast.LENGTH_SHORT).show();
-                                getContacts(address);
+
+                                getContacts(address, url);
 
                             } catch (Exception e) {
                                 e.printStackTrace();
@@ -205,7 +286,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     }
 
-    private void getContacts(String address) {
+
+
+
+    private void getContacts(String address, String url) {
         firebaseUser = mAuth.getCurrentUser();
         id = firebaseUser.getUid();
 
@@ -224,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         User user = dataSnapshot.getValue(User.class);
                         userName = user.getName();
-                        sendSMS(address,userName, name, number);
+                        sendSMS(address,url,userName, name, number);
                     }
 
                     @Override
@@ -241,16 +325,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
-    private void sendSMS(String address, String username, String contactName, String number){
-        String message = "Hi "+contactName+", please check in with "
+    private void sendSMS(String address, String url, String username, String contactName, String number){
+        String message1 = "Hi "+contactName+", please check in with "
                 +username+ " as they seem to have gotten into trouble at "+address;
+        String message2 = ". The Google Maps link is "+url;
+        ArrayList<String> parts = new ArrayList<>();
+        parts.add(message1);
+        parts.add(message2);
         try{
             SmsManager smsManager = SmsManager.getDefault();
-            smsManager.sendTextMessage(number, null, message, null, null);
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+            smsManager.sendMultipartTextMessage(number, null, parts, null, null);
+            Toast.makeText(this, "Location Sent", Toast.LENGTH_SHORT).show();
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(this, "Failed to send message, isSMSPermissionGranted: " +isSMSPermissionGranted, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
         }
     }
 

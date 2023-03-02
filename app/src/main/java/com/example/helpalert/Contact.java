@@ -1,27 +1,38 @@
 package com.example.helpalert;
 
-public class Contact {
-    private String Name;
-    private int number;
+import java.util.HashMap;
 
+public class Contact {
+    private String name;
+    private String number;
 
     public Contact(){
-
     }
 
     public String getName() {
-        return Name;
+        return name;
     }
 
     public void setName(String name) {
-        Name = name;
+        this.name = name;
     }
 
-    public int getNumber() {
+    public String getNumber() {
         return number;
     }
 
-    public void setAge(int number) {
+    public void setNumber(String number) {
         this.number = number;
     }
+
+
+
+    @Override
+    public String toString() {
+        return "Contact{" +
+                "name='" + name + '\'' +
+                ", number='" + number + '\'' +
+                '}';
+    }
+
 }
