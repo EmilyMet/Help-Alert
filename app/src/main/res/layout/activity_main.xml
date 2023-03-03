@@ -8,10 +8,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
     <ImageView
         android:layout_width="252dp"
         android:layout_height="49dp"
         android:layout_marginBottom="80dp"
+        android:contentDescription="AppLogo"
         android:src="@drawable/helpalertimage"></ImageView>
 
     <TextView
@@ -29,9 +31,10 @@
 
     <Button
         android:id="@+id/button_location"
-        android:layout_width="208dp"
-        android:layout_height="205dp"
+        android:layout_width="203dp"
+        android:layout_height="180dp"
         android:layout_marginBottom="50dp"
+        android:layout_weight="1"
         android:background="@drawable/button_shape"
         android:text="Hold For Tracking"
         tools:layout_editor_absoluteX="133dp" />
@@ -40,11 +43,18 @@
         android:id="@+id/text_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="50dp"
         android:text="Current Location"
         android:gravity="center"
         android:textSize="18sp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="31dp" />
+
+    <include
+        layout="@layout/navigation_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true" />
+
 
 </LinearLayout>

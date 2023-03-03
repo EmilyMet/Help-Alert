@@ -3,6 +3,7 @@ package com.example.helpalert;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
@@ -22,6 +23,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.telephony.SmsManager;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +33,13 @@ import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -40,7 +48,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -51,12 +61,15 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     Button buttonLogout, buttonLocation;
     FirebaseAuth mAuth;
     TextView userInfo, textLocation;
-    DatabaseReference reff;
+    DatabaseReference reff, reffAlerts;
+    long maxid=0;
     FirebaseUser firebaseUser;
     LocationManager locationManager;
     FusedLocationProviderClient fusedLocationClient;
     String id, name, number, userName;
     Contact contact;
+    BottomNavigationView navigationView;
+    Double latitude, longitude;
 
     ActivityResultLauncher<String[]> mPermissionResultLauncher;
     private boolean isCourseLocationPermissionGranted = false;
@@ -80,6 +93,21 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         textLocation = findViewById(R.id.text_location);
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        reffAlerts = FirebaseDatabase.getInstance("https://help-alert-c5e2d-default-rtdb.europe-west1.firebasedatabase.app").getReference("Alerts");
+
+        reffAlerts.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if(snapshot.exists())
+                    maxid = (snapshot.getChildrenCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
         mPermissionResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
             @Override
@@ -111,6 +139,34 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         } else {
             userInfo.setText(firebaseUser.getEmail());
         }
+
+
+
+        navigationView = findViewById(R.id.navigation);
+        navigationView.setSelectedItemId(R.id.buttonTrack);
+
+        navigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.buttonTrack:
+                        // Handle the home button click
+                        startActivity(new Intent(MainActivity.this, MainActivity.class));
+                        return true;
+                    case R.id.mapTrack:
+                        // Handle the dashboard button click
+                        startActivity(new Intent(MainActivity.this, MapTracking.class));
+                        return true;
+                    case R.id.account:
+                        // Handle the notifications button click
+                        startActivity(new Intent(MainActivity.this, AccountSettings.class));
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+
 
         //Create the Dialog here
         dialog = new Dialog(this);
@@ -181,6 +237,19 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         });
     }
 
+//    @Override
+//    protected void onSaveInstanceState(Bundle outState) {
+//        super.onSaveInstanceState(outState);
+//        outState.putInt("selectedItemId", navigationView.getSelectedItemId());
+//    }
+//
+//    @Override
+//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+//        super.onRestoreInstanceState(savedInstanceState);
+//        int selectedItemId = savedInstanceState.getInt("selectedItemId", R.id.buttonTrack);
+//        navigationView.setSelectedItemId(selectedItemId);
+//    }
+
     private void startCheckInDialog(){
         dialog.show();
         timer = new CountDownTimer(10000, 1000) {
@@ -249,10 +318,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             // Logic to handle location object
                             Toast.makeText(MainActivity.this, "Getting Location", Toast.LENGTH_SHORT).show();
                             try {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
                                 Geocoder geocoder = new Geocoder(MainActivity.this, Locale.getDefault());
-                                List<Address> addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+                                List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
                                 String address = addresses.get(0).getAddressLine(0);
-                                String url = "https://www.google.com/maps/search/?api=1&query=" + location.getLatitude() + "," + location.getLongitude();
+                                String url = "https://www.google.com/maps/search/?api=1&query=" + latitude + "," + longitude;
                                 Log.d("MyApp", url);
 
                                 textLocation.setText(address);
@@ -336,10 +407,25 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             SmsManager smsManager = SmsManager.getDefault();
             smsManager.sendMultipartTextMessage(number, null, parts, null, null);
             Toast.makeText(this, "Location Sent", Toast.LENGTH_SHORT).show();
+            storeAlertData(username, address);
         }catch (Exception e){
             e.printStackTrace();
             Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void storeAlertData(String userName, String address){
+        Date currentDate = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String dateString = dateFormat.format(currentDate);
+
+        Alert alert = new Alert();
+        alert.setName(userName);
+        alert.setDate(dateString);
+        alert.setAddress(address);
+        alert.setLatitude(latitude);
+        alert.setLongitude(longitude);
+        reffAlerts.child(String.valueOf(maxid)).setValue(alert);
     }
 
 }
