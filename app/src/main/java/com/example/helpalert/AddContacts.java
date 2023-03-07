@@ -98,8 +98,6 @@ public class AddContacts extends AppCompatActivity {
                     @Override
                     public void onCancelled(DatabaseError error) {
                         Toast.makeText(AddContacts.this,"Failed to read user detail",Toast.LENGTH_SHORT).show();
-
-
                     }
                 });
 

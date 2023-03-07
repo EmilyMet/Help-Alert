@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:hint="@string/email"
         android:textColorHint="#616161"
-        tools:ignore="TextContrmetadjer@rocketmail.comastCheck" />
+        tools:ignore="TextContrastCheck" />
 
 
     <com.google.android.material.textfield.TextInputEditText

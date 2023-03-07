@@ -18,11 +18,32 @@
     <TextView
         android:id="@+id/user_details"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="204dp"
         android:layout_weight="1"
         android:gravity="center"
-        android:textSize="25sp"
-        android:text="Welcome to Account Settings!" />
+        android:text="Welcome to Account Settings!"
+        android:textSize="25sp" />
+
+    <Button
+        android:id="@+id/contact"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="Change contact details" />
+
+    <Button
+        android:id="@+id/password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="50dp"
+        android:text="Change password" />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="120dp"
+        android:text="@string/logout" />
 
     <include
         layout="@layout/navigation_bar"

@@ -52,6 +52,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -79,11 +81,14 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
     LocationManager locationManager;
     FusedLocationProviderClient fusedLocationClient;
     private Double latitude, longitude;
+    FirebaseUser firebaseUser;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map_tracking);
+        mAuth = FirebaseAuth.getInstance();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         reffAlerts = FirebaseDatabase.getInstance("https://help-alert-c5e2d-default-rtdb.europe-west1.firebasedatabase.app").getReference("Alerts");
@@ -102,6 +107,15 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
         });
 
         requestPermission();
+
+        firebaseUser = mAuth.getCurrentUser();
+        if (firebaseUser == null) {
+            Intent intent = new Intent(getApplicationContext(), Login.class);
+            startActivity(intent);
+            finish();
+        } else {
+            //userInfo.setText(firebaseUser.getEmail());
+        }
 
         reffAlerts.addValueEventListener(new ValueEventListener() {
             @Override

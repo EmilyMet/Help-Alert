@@ -12,43 +12,69 @@
     <ImageView
         android:layout_width="252dp"
         android:layout_height="49dp"
-        android:layout_marginBottom="80dp"
+        android:layout_marginBottom="40dp"
         android:contentDescription="AppLogo"
         android:src="@drawable/helpalertimage"></ImageView>
 
     <TextView
         android:id="@+id/user_details"
-        android:layout_width="wrap_content"
+        android:layout_width="293dp"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
-
-    <Button
-        android:text="@string/logout"
-        android:id="@+id/logout"
-        android:layout_marginBottom="80dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/button_location"
-        android:layout_width="203dp"
-        android:layout_height="180dp"
         android:layout_marginBottom="50dp"
-        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Hold the button to start location tracking"
+        android:textSize="20sp" />
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/button_location"
+        android:layout_width="244dp"
+        android:layout_height="246dp"
         android:background="@drawable/button_shape"
         android:text="Hold For Tracking"
+        android:textColor="@color/white"
+        android:textStyle="bold"
         tools:layout_editor_absoluteX="133dp" />
 
     <TextView
         android:id="@+id/text_location"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="50dp"
+        android:layout_margin="40dp"
         android:text="Current Location"
         android:gravity="center"
         android:textSize="18sp"
         android:textStyle="bold"
         tools:layout_editor_absoluteX="31dp" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        >
+
+
+        <Button
+            android:id="@+id/pauseTrack"
+            android:layout_width="114dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="65dp"
+            android:layout_marginTop="10dp"
+            android:text="Pause Tracking"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/sendlocation"
+            android:layout_width="114dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="230dp"
+            android:layout_marginTop="10dp"
+            android:text="Send location"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <include
         layout="@layout/navigation_bar"

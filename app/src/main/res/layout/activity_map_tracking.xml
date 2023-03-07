@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="25sp"
-        android:text="Welcome to Map Tracking!" />
+        android:text="View past location alerts near you" />
 
     <fragment
         android:id="@+id/map"

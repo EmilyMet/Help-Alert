@@ -58,7 +58,7 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements LocationListener {
 
-    Button buttonLogout, buttonLocation;
+    Button buttonLocation, buttonPause, buttonSend;
     FirebaseAuth mAuth;
     TextView userInfo, textLocation;
     DatabaseReference reff, reffAlerts;
@@ -77,6 +77,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     private boolean isSMSPermissionGranted = false;
     private boolean isResponseYes = false;
     private boolean isResponseNo = false;
+    private boolean isTracking = false;
+    private boolean isHoldingButton = false;
     private Dialog dialog;
     CountDownTimer timer;
 
@@ -86,8 +88,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonLogout = findViewById(R.id.logout);
         buttonLocation = findViewById(R.id.button_location);
+        buttonPause = findViewById(R.id.pauseTrack);
+        buttonSend = findViewById(R.id.sendlocation);
         mAuth = FirebaseAuth.getInstance();
         userInfo = findViewById(R.id.user_details);
         textLocation = findViewById(R.id.text_location);
@@ -137,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             startActivity(intent);
             finish();
         } else {
-            userInfo.setText(firebaseUser.getEmail());
+            //userInfo.setText(firebaseUser.getEmail());
         }
 
 
@@ -201,13 +204,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             }
         });
 
-        buttonLogout.setOnClickListener(view -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(getApplicationContext(), Login.class);
-            startActivity(intent);
-            finish();
-        });
-
 
         buttonLocation.setOnTouchListener(new View.OnTouchListener() {
             private long start = 0;
@@ -216,17 +212,26 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    this.start = System.currentTimeMillis();
+                    isTracking = true;
+                    isResponseNo = false;
+                    isResponseYes = false;
+                    isHoldingButton = true;
+                    userInfo.setText("Tracking location...");
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
-
-                    new CountDownTimer(10000, 1000) {
+                    isHoldingButton = false;
+                    timer = new CountDownTimer(10000, 1000) {
                         public void onTick(long millisUntilFinished) {
                             // Do nothing every second until 30 seconds have passed
+                            if(isHoldingButton){
+                                timer.cancel();
+                            }
                         }
 
                         public void onFinish() {
                             // Call your function after 30 seconds have passed
-                            startCheckInDialog();
+                            if(isTracking && !isHoldingButton) {
+                                startCheckInDialog();
+                            }
                         }
                     }.start();
 
@@ -235,43 +240,57 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                 return true;
             }
         });
-    }
 
-//    @Override
-//    protected void onSaveInstanceState(Bundle outState) {
-//        super.onSaveInstanceState(outState);
-//        outState.putInt("selectedItemId", navigationView.getSelectedItemId());
-//    }
-//
-//    @Override
-//    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-//        super.onRestoreInstanceState(savedInstanceState);
-//        int selectedItemId = savedInstanceState.getInt("selectedItemId", R.id.buttonTrack);
-//        navigationView.setSelectedItemId(selectedItemId);
-//    }
+        buttonPause.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(isTracking) {
+                    isTracking = false;
+                    userInfo.setText("Hold the button to start location tracking");
+                }
+            }
+        });
+
+        buttonSend.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getLocation();
+            }
+        });
+    }
 
     private void startCheckInDialog(){
         dialog.show();
         timer = new CountDownTimer(10000, 1000) {
             public void onTick(long millisUntilFinished) {
                 // Do nothing every second until 30 seconds have passed
-                if (isResponseYes){
+                if (isResponseYes) {
                     getLocation();
                     timer.cancel();
+                    userInfo.setText("Hold the button to start location tracking");
+                    isTracking = false;
                 }
-                if (isResponseNo){
+                if (isResponseNo) {
+                    timer.cancel();
+                    userInfo.setText("Hold the button to start location tracking");
+                    isTracking = false;
+                }
+                if(!isTracking) {
                     timer.cancel();
                 }
             }
 
             public void onFinish() {
                 // Call your function after 30 seconds have passed
-                if(!isResponseYes && !isResponseNo){
+                if (!isResponseYes && !isResponseNo) {
                     getLocation();
+                    userInfo.setText("Hold the button to start location tracking");
+                    isTracking = false;
                 }
-                dialog.dismiss();
+                    dialog.dismiss();
             }
         }.start();
+
     }
 
     private void requestPermission(){
