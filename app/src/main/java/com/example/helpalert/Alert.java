@@ -1,23 +1,55 @@
 package com.example.helpalert;
 
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.TimeZone;
+
 public class Alert {
-    private String userName;
-    private String date;
+    private String id;
+    private Date date;
     private String address;
     private Double latitude;
     private Double longitude;
 
-    public String getName() {
-        return userName;
+    public String getId() {
+        return id;
     }
 
-    public void setName(String name) {
-        this.userName = name;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public String getDate(){ return date; }
+    public Date getDate(){return date;}
 
-    public void setDate(String date){this.date = date;}
+    public String getDateString(){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        String dateString = dateFormat.format(date);
+        return dateString;
+    }
+
+    public String getTimeString(){
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        formatter.setTimeZone(TimeZone.getDefault());
+        String timeString = formatter.format(date);
+        return timeString;
+    }
+
+    public String getDayString(){
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        String dayOfWeekString = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+        return dayOfWeekString;
+    }
+
+    public void setDate(Date date){this.date = date;}
 
     public String getAddress() {
         return address;

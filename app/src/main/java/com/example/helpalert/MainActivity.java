@@ -440,12 +440,13 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
     private void storeAlertData(String userName, String address){
         Date currentDate = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        String dateString = dateFormat.format(currentDate);
+        String id = firebaseUser.getUid();
+        //SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+        //String dateString = dateFormat.format(currentDate);
 
         Alert alert = new Alert();
-        alert.setName(userName);
-        alert.setDate(dateString);
+        alert.setId(String.valueOf(id));
+        alert.setDate(currentDate);
         alert.setAddress(address);
         alert.setLatitude(latitude);
         alert.setLongitude(longitude);

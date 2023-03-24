@@ -184,7 +184,7 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
         for (int i = 0; i < alertList.size(); i++) {
             a = alertList.get(i);
             alertLatLng = new LatLng(a.getLatitude(), a.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(alertLatLng).title(a.getDate() + " " +a.getAddress())
+            mMap.addMarker(new MarkerOptions().position(alertLatLng).title(a.getTimeString() + ", " +a.getDayString() + ", " +a.getDateString())
                     .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_fmd_bad_24)));
         }
 
@@ -193,6 +193,7 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
 //
 //        mMap.addMarker(new MarkerOptions().position(currLocation).title("Your current location"));
 //        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLocation, 12f));
+        getDeviceLocation();
     }
 
     private void getDeviceLocation() {
@@ -208,8 +209,9 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
                             LatLng currentLatLng = new LatLng(location.getLatitude(),
                                     location.getLongitude());
                             CameraUpdate update = CameraUpdateFactory.newLatLngZoom(currentLatLng,
-                                    12f);
+                                    16f);
                             mMap.moveCamera(update);
+                            mMap.getUiSettings().setMyLocationButtonEnabled(true);
                         }
                     }
                 });
