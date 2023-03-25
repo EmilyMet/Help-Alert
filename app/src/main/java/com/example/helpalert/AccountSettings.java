@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -39,7 +40,8 @@ public class AccountSettings extends AppCompatActivity {
     private Dialog passwordDialog, contactDialog;
     TextInputEditText editTextOldPass, editTextNewPass, editTextConfirmPass;
     TextInputEditText editTxtName, editTxtNumber;
-    String email;
+    TextView txtName, txtEmail, txtCName, txtCNumber;
+    String email, name, cName, cNumber;
     User user;
     String id, userName, userEmail;
     Contact contact;
@@ -54,6 +56,10 @@ public class AccountSettings extends AppCompatActivity {
         buttonLogout = findViewById(R.id.logout);
         buttonContacts = findViewById(R.id.contact);
         buttonPassword = findViewById(R.id.password);
+        txtName = findViewById(R.id.name);
+        txtEmail = findViewById(R.id.email);
+        txtCName = findViewById(R.id.contact_name);
+        txtCNumber = findViewById(R.id.contact_number);
 
         navigationView = findViewById(R.id.navigation);
         navigationView.setSelectedItemId(R.id.account);
@@ -68,6 +74,10 @@ public class AccountSettings extends AppCompatActivity {
                     case R.id.mapTrack:
                         // Handle the dashboard button click
                         startActivity(new Intent(AccountSettings.this, MapTracking.class));
+                        return true;
+                    case R.id.analytics:
+                        // Handle the notifications button click
+                        startActivity(new Intent(AccountSettings.this, AnalyticsActivity.class));
                         return true;
                     case R.id.account:
                         // Handle the notifications button click
@@ -86,7 +96,14 @@ public class AccountSettings extends AppCompatActivity {
             finish();
         } else {
             email = firebaseUser.getEmail();
+            id = firebaseUser.getUid();
+            loadUserDetails();
         }
+
+
+
+
+
 
         passwordDialog = new Dialog(this);
         passwordDialog.setContentView(R.layout.password_dialog);
@@ -176,6 +193,7 @@ public class AccountSettings extends AppCompatActivity {
                 else{
                     changeContact(cName, cNumber);
                     contactDialog.dismiss();
+                    loadUserDetails();
                 }
 
             }
@@ -207,8 +225,6 @@ public class AccountSettings extends AppCompatActivity {
     }
 
     private void changePassword(String newPassword){
-        //FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        //FirebaseUser user = mAuth.getCurrentUser();
 
         firebaseUser.updatePassword(newPassword)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -249,6 +265,43 @@ public class AccountSettings extends AppCompatActivity {
 
                 }
 
+            }
+        });
+    }
+
+    private void loadUserDetails(){
+        reff = FirebaseDatabase.getInstance("https://help-alert-c5e2d-default-rtdb.europe-west1.firebasedatabase.app").getReference("Users");
+        reff.child(id).child("contacts").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                DatabaseReference parentRef = dataSnapshot.getRef().getParent();
+                contact = dataSnapshot.getValue(Contact.class);
+                cName = contact.getName();
+                cNumber = contact.getNumber();
+
+                parentRef.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        name = user.getName();
+                        txtName.setText("Name:\t\t\t" +name);
+                        txtEmail.setText("Email:\t\t\t" +email);
+                        txtCName.setText("Contact Name:\t\t\t\t" + cName);
+                        txtCNumber.setText("Contact Number:\t\t\t" + cNumber);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        // Handle errors here
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(AccountSettings.this, "Failed to read user detail", Toast.LENGTH_SHORT).show();
             }
         });
     }

@@ -107,8 +107,9 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         reffAlerts.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if(snapshot.exists())
+                if(snapshot.exists()) {
                     maxid = (snapshot.getChildrenCount());
+                }
             }
 
             @Override
@@ -164,6 +165,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                     case R.id.mapTrack:
                         // Handle the dashboard button click
                         startActivity(new Intent(MainActivity.this, MapTracking.class));
+                        return true;
+                    case R.id.analytics:
+                        // Handle the notifications button click
+                        startActivity(new Intent(MainActivity.this, AnalyticsActivity.class));
                         return true;
                     case R.id.account:
                         // Handle the notifications button click
@@ -445,12 +450,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         //String dateString = dateFormat.format(currentDate);
 
         Alert alert = new Alert();
-        alert.setId(String.valueOf(id));
+        alert.setId(id);
         alert.setDate(currentDate);
         alert.setAddress(address);
         alert.setLatitude(latitude);
         alert.setLongitude(longitude);
-        reffAlerts.child(String.valueOf(maxid)).setValue(alert);
+        reffAlerts.child(String.valueOf(maxid + 1)).setValue(alert);
     }
 
 }

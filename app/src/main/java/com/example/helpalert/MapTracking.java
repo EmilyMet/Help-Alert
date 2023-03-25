@@ -16,33 +16,18 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Looper;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.example.helpalert.databinding.ActivityMapsBinding;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.Granularity;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.Priority;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -50,7 +35,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,25 +47,19 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 public class MapTracking extends AppCompatActivity implements OnMapReadyCallback {
 
     BottomNavigationView navigationView;
-    MapView mapView;
-    GoogleMap map;
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
     DatabaseReference reffAlerts;
-    long maxid=0;
     ArrayList<Alert> alertList = new ArrayList<Alert>();
     ActivityResultLauncher<String[]> mPermissionResultLauncher;
     private boolean isCourseLocationPermissionGranted = false;
     private boolean isFineLocationPermissionGranted = false;
     LocationManager locationManager;
     FusedLocationProviderClient fusedLocationClient;
-    private Double latitude, longitude;
     FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
 
@@ -151,6 +129,10 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
                         // Handle the dashboard button click
                         startActivity(new Intent(MapTracking.this, MapTracking.class));
                         return true;
+                    case R.id.analytics:
+                        // Handle the notifications button click
+                        startActivity(new Intent(MapTracking.this, AnalyticsActivity.class));
+                        return true;
                     case R.id.account:
                         // Handle the notifications button click
                         startActivity(new Intent(MapTracking.this, AccountSettings.class));
@@ -187,12 +169,6 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(alertLatLng).title(a.getTimeString() + ", " +a.getDayString() + ", " +a.getDateString())
                     .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_fmd_bad_24)));
         }
-
-//        LatLng currLocation = new LatLng(53.2800, -9.0583);
-//        //LatLng currLocation = new LatLng(latitude, longitude);
-//
-//        mMap.addMarker(new MarkerOptions().position(currLocation).title("Your current location"));
-//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLocation, 12f));
         getDeviceLocation();
     }
 
@@ -220,26 +196,6 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
             Log.e("Exception: %s", e.getMessage());
         }
     }
-
-    private void updateLocationUI() {
-        if (mMap == null) {
-            return;
-        }
-        try {
-            if (isFineLocationPermissionGranted) {
-                mMap.setMyLocationEnabled(true);
-                mMap.getUiSettings().setMyLocationButtonEnabled(true);
-                getDeviceLocation();
-            } else {
-                mMap.setMyLocationEnabled(false);
-                mMap.getUiSettings().setMyLocationButtonEnabled(false);
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage());
-        }
-    }
-
-
 
     private BitmapDescriptor BitmapFromVector(Context context, int vectorResId) {
         // below line is use to generate a drawable.

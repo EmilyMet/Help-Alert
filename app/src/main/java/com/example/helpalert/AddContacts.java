@@ -84,7 +84,6 @@ public class AddContacts extends AppCompatActivity {
 
                 firebaseUser = mAuth.getCurrentUser();
                 id = firebaseUser.getUid();
-                Toast.makeText(AddContacts.this, id, Toast.LENGTH_SHORT).show();
 
                 reff = FirebaseDatabase.getInstance("https://help-alert-c5e2d-default-rtdb.europe-west1.firebasedatabase.app").getReference("Users");
                 reff.child(id).addValueEventListener(new ValueEventListener() {
@@ -115,7 +114,6 @@ public class AddContacts extends AppCompatActivity {
                     public void onComplete(@NonNull Task task) {
 
                         if (task.isSuccessful()){
-                            Toast.makeText(AddContacts.this,"Successfully Updated",Toast.LENGTH_SHORT).show();
                             nextPage();
 
                         }else {

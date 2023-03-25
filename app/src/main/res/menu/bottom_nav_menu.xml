@@ -2,12 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/buttonTrack"
-        android:title="Button Tracking"
+        android:title="Button Tracker"
         android:icon="@drawable/ic_baseline_emergency_share_24"/>
 
     <item android:id="@+id/mapTrack"
-        android:title="Map Tracking"
+        android:title="Past Alerts"
         android:icon="@drawable/ic_baseline_pin_drop_24"/>
+
+    <item android:id="@+id/analytics"
+        android:title="Analytics"
+        android:icon="@drawable/ic_baseline_bar_chart_24"/>
 
     <item android:id="@+id/account"
         android:title="Account"

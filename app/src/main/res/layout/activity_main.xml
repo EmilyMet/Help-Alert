@@ -64,7 +64,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/text_location"
         android:layout_centerHorizontal="true"
-        android:layout_marginStart="65dp"
+        android:layout_marginStart="50dp"
         android:layout_alignParentLeft="true"
         android:text="Pause Tracking" />
 
@@ -74,7 +74,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/text_location"
         android:layout_centerHorizontal="true"
-        android:layout_marginEnd="65dp"
+        android:layout_marginEnd="50dp"
         android:layout_alignParentRight="true"
         android:text="Send location" />
 
