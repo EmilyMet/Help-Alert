@@ -76,7 +76,6 @@ public class AddContacts extends AppCompatActivity {
                     Toast.makeText(AddContacts.this, "Enter email", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                //Toast.makeText(AddContacts.this, name, Toast.LENGTH_SHORT).show();
 
                 contact = new Contact();
                 contact.setNumber(name);
@@ -94,7 +93,6 @@ public class AddContacts extends AppCompatActivity {
                         user = dataSnapshot.getValue(User.class);
                         userName = user.getName();
                         userEmail = user.getEmail();
-
                     }
 
                     @Override
@@ -102,8 +100,6 @@ public class AddContacts extends AppCompatActivity {
                         Toast.makeText(AddContacts.this,"Failed to read user detail",Toast.LENGTH_SHORT).show();
                     }
                 });
-
-
 
                 HashMap contactDetails = new HashMap<>();
                 contactDetails.put("name", name);
@@ -117,14 +113,11 @@ public class AddContacts extends AppCompatActivity {
                             nextPage();
 
                         }else {
-                            Toast.makeText(AddContacts.this,"Failed to Update",Toast.LENGTH_SHORT).show();
-
+                            Log.e("AddContacts", "Failed to update contact.");
                         }
 
                     }
                 });
-
-
             }
         });
     }

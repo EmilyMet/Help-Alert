@@ -1,17 +1,12 @@
 package com.example.helpalert;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class User {
     private String name;
     private String email;
-    private int numContacts;
-    //private ArrayList<Contact> contacts;
     private HashMap<String,String> contactDetails;
 
     public User(){
-        //contacts = new ArrayList<Contact>();
-        numContacts = 0;
     }
 
     public String getName() {
@@ -33,10 +28,5 @@ public class User {
     public HashMap<String, String> getContacts(){
         return contactDetails;
     }
-
-//    public void addContact(Contact contact){
-//        numContacts++;
-//        contacts.add(contact);
-//    }
 
 }

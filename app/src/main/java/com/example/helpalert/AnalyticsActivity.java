@@ -9,12 +9,10 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -112,7 +110,6 @@ public class AnalyticsActivity extends AppCompatActivity {
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     // Get the value of the child node as a Java object
                     Alert alert = childSnapshot.getValue(Alert.class);
-                    //Toast.makeText(AnalyticsActivity.this, alert.getDayString(), Toast.LENGTH_SHORT).show();
                     alertList.add(alert);
 
                     Calendar calendar = Calendar.getInstance();
@@ -165,14 +162,12 @@ public class AnalyticsActivity extends AppCompatActivity {
 
                     BarDataSet barDataSet = new BarDataSet(alertsChart, "Alerts");
                     barDataSet.setColors(ColorTemplate.MATERIAL_COLORS);
-                    //barDataSet.setValueTextColor(Color.BLACK);
                     barDataSet.setValueTextSize(16f);
 
                     BarData barData = new BarData(barDataSet);
                     barChart.setFitBars(true);
                     barChart.setData(barData);
                     barChart.getDescription().setEnabled(false);
-                    //barChart.getDescription().setText("Bar Chart Test");
                     barChart.animateY(2000);
 
                     XAxis xAxis = barChart.getXAxis();
@@ -249,16 +244,6 @@ public class AnalyticsActivity extends AppCompatActivity {
 
                     HashMap<String, Integer> countyFrequency = new HashMap<>();
                     String address;
-//                    for (String county : counties) {
-//                        if(address.contains(county)){
-//                            if (countyFrequency.containsKey(county)) {
-//                                countyFrequency.put(county, countyFrequency.get(county) + 1);
-//                            } else {
-//                                countyFrequency.put(county, 1);
-//                            }
-//                        }
-//
-//                    }
                     for (String county : counties) {
                         int count = 0;
                         for (Alert a : alertList) {
@@ -293,10 +278,6 @@ public class AnalyticsActivity extends AppCompatActivity {
                     pieChart.setData(pieData);
                     pieChart.getDescription().setEnabled(false);
                     pieChart.animateY(2000);
-
-
-
-
 
                 }
             }

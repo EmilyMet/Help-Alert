@@ -28,20 +28,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.navigation.NavigationBarView;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -50,7 +44,6 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -89,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         ActionBar actionBar = getSupportActionBar();
         actionBar.hide();
         setContentView(R.layout.activity_main);
@@ -145,11 +137,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             Intent intent = new Intent(getApplicationContext(), Login.class);
             startActivity(intent);
             finish();
-        } else {
-            //userInfo.setText(firebaseUser.getEmail());
         }
-
-
 
         navigationView = findViewById(R.id.navigation);
         navigationView.setSelectedItemId(R.id.buttonTrack);
@@ -197,8 +185,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         bttnYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //Toast.makeText(MainActivity.this, "Okay", Toast.LENGTH_SHORT).show();
                 isResponseYes = true;
                 dialog.dismiss();
             }
@@ -207,18 +193,12 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
         bttnNo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //Toast.makeText(MainActivity.this, "Cancel", Toast.LENGTH_SHORT).show();
                 isResponseNo = true;
                 dialog.dismiss();
             }
         });
 
-
         buttonLocation.setOnTouchListener(new View.OnTouchListener() {
-            private long start = 0;
-            private long end = 0;
-
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -244,8 +224,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             }
                         }
                     }.start();
-
-                    //getLocation();
                 }
                 return true;
             }
@@ -345,7 +323,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                         // Got last known location. In some rare situations this can be null.
                         if (location != null) {
                             // Logic to handle location object
-                            Toast.makeText(MainActivity.this, "Getting Location", Toast.LENGTH_SHORT).show();
                             try {
                                 latitude = location.getLatitude();
                                 longitude = location.getLongitude();
@@ -364,7 +341,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
                             }
                         }
                         else{
-                            Toast.makeText(MainActivity.this, "Location is null", Toast.LENGTH_SHORT).show();
+                            Log.w("MainActivity", "Location is null.");
                         }
                     }
                 });
@@ -420,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(MainActivity.this, "Failed to read user detail", Toast.LENGTH_SHORT).show();
+                Log.e("MainActivity", "Failed to read user detail.");
             }
         });
     }
@@ -439,15 +416,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener 
             storeAlertData(username, address);
         }catch (Exception e){
             e.printStackTrace();
-            Toast.makeText(this, "Failed to send message", Toast.LENGTH_SHORT).show();
+            Log.e("MainActivity", "Failed to send message.");
+
         }
     }
 
     private void storeAlertData(String userName, String address){
         Date currentDate = new Date();
         String id = firebaseUser.getUid();
-        //SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
-        //String dateString = dateFormat.format(currentDate);
 
         Alert alert = new Alert();
         alert.setId(id);

@@ -42,8 +42,7 @@ public class AccountSettings extends AppCompatActivity {
     TextInputEditText editTxtName, editTxtNumber;
     TextView txtName, txtEmail, txtCName, txtCNumber;
     String email, name, cName, cNumber;
-    User user;
-    String id, userName, userEmail;
+    String id;
     Contact contact;
 
     @Override
@@ -100,11 +99,6 @@ public class AccountSettings extends AppCompatActivity {
             loadUserDetails();
         }
 
-
-
-
-
-
         passwordDialog = new Dialog(this);
         passwordDialog.setContentView(R.layout.password_dialog);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -134,7 +128,7 @@ public class AccountSettings extends AppCompatActivity {
                     return;
                 }
                 else if (TextUtils.isEmpty(newPass)) {
-                    Toast.makeText(AccountSettings.this, "Enter password", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AccountSettings.this, "Enter new password", Toast.LENGTH_LONG).show();
                     return;
                 }
                 else if (TextUtils.isEmpty(confirmPass)) {
@@ -142,7 +136,7 @@ public class AccountSettings extends AppCompatActivity {
                     return;
                 }
                 else if (!newPass.equals(confirmPass)){
-                    Toast.makeText(AccountSettings.this, "Two passwords don't watch", Toast.LENGTH_LONG).show();
+                    Toast.makeText(AccountSettings.this, "Two passwords don't match", Toast.LENGTH_LONG).show();
                     return;
                 }
                 else{
@@ -155,7 +149,6 @@ public class AccountSettings extends AppCompatActivity {
         bttnCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(MainActivity.this, "Cancel", Toast.LENGTH_SHORT).show();
                 passwordDialog.dismiss();
             }
         });
@@ -202,8 +195,6 @@ public class AccountSettings extends AppCompatActivity {
         bttnCanc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                //Toast.makeText(MainActivity.this, "Cancel", Toast.LENGTH_SHORT).show();
                 contactDialog.dismiss();
             }
         });
@@ -231,9 +222,9 @@ public class AccountSettings extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(AccountSettings.this, "User password updated successfully.", Toast.LENGTH_SHORT).show();
+                            Log.d("AccountSettings", "User password updated successfully.");
                         } else {
-                            Toast.makeText(AccountSettings.this, "User password update failed.", Toast.LENGTH_SHORT).show();
+                            Log.d("AccountSettings", "User password update failed.");
                         }
                     }
                 });
@@ -258,10 +249,10 @@ public class AccountSettings extends AppCompatActivity {
             public void onComplete(@NonNull Task task) {
 
                 if (task.isSuccessful()){
-                    Toast.makeText(AccountSettings.this,"Successfully Updated",Toast.LENGTH_SHORT).show();
+                    Log.d("AccountSettings", "Contact details updated successfully.");
 
                 }else {
-                    Toast.makeText(AccountSettings.this,"Failed to Update",Toast.LENGTH_SHORT).show();
+                    Log.d("AccountSettings", "Failed to update contact details.");
 
                 }
 
@@ -294,14 +285,16 @@ public class AccountSettings extends AppCompatActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-                        // Handle errors here
+                        String errorMessage = databaseError.getMessage();
+                        Log.e("Database Error", errorMessage, databaseError.toException());
                     }
                 });
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(AccountSettings.this, "Failed to read user detail", Toast.LENGTH_SHORT).show();
+                String errorMessage = databaseError.getMessage();
+                Log.e("Database Error", errorMessage, databaseError.toException());
             }
         });
     }

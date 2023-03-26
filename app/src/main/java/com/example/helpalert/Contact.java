@@ -1,7 +1,5 @@
 package com.example.helpalert;
 
-import java.util.HashMap;
-
 public class Contact {
     private String name;
     private String number;
@@ -25,8 +23,6 @@ public class Contact {
         this.number = number;
     }
 
-
-
     @Override
     public String toString() {
         return "Contact{" +
@@ -34,5 +30,4 @@ public class Contact {
                 ", number='" + number + '\'' +
                 '}';
     }
-
 }

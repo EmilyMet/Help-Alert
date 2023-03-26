@@ -1,13 +1,8 @@
 package com.example.helpalert;
 
 import java.text.SimpleDateFormat;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -44,7 +39,6 @@ public class Alert {
     public String getDayString(){
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
-        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
         String dayOfWeekString = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
         return dayOfWeekString;
     }

@@ -27,7 +27,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
@@ -94,8 +93,6 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
             Intent intent = new Intent(getApplicationContext(), Login.class);
             startActivity(intent);
             finish();
-        } else {
-            //userInfo.setText(firebaseUser.getEmail());
         }
 
         reffAlerts.addValueEventListener(new ValueEventListener() {
@@ -104,14 +101,14 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     // Get the value of the child node as a Java object
                     Alert alert = childSnapshot.getValue(Alert.class);
-                    Log.d("Testing Alerts", alert.getAddress());
                     alertList.add(alert);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                String errorMessage = error.getMessage();
+                Log.e("Database Error", errorMessage, error.toException());
             }
         });
 
@@ -148,8 +145,6 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
     }
 
-    //TODO:
-    //Fix current location latitude and longitude not reading before map is rendered
     @SuppressLint("MissingPermission")
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -158,7 +153,6 @@ public class MapTracking extends AppCompatActivity implements OnMapReadyCallback
         if(isFineLocationPermissionGranted){
             mMap.setMyLocationEnabled(true);
             mMap.getUiSettings().setMyLocationButtonEnabled(true);
-            //getDeviceLocation();
         }
         Alert a;
         LatLng alertLatLng;

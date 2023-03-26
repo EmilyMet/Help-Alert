@@ -119,8 +119,6 @@ public class Register extends AppCompatActivity {
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 progressBar.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(Register.this, "Account created.",
-                                            Toast.LENGTH_SHORT).show();
                                     firebaseUser = mAuth.getCurrentUser();
                                     id = firebaseUser.getUid();
                                     user.setName(name);
@@ -129,17 +127,10 @@ public class Register extends AppCompatActivity {
                                     nextPage();
                                 } else {
                                     // If sign in fails, display a message to the user.
-                                    Toast.makeText(Register.this, "Authentication failed.",
-                                            Toast.LENGTH_SHORT).show();
-
+                                    Log.e("Register", "Authentication failed.");
                                 }
                             }
                         });
-
-                //firebaseUser = mAuth.getCurrentUser();
-
-
-
             }
         });
     }
